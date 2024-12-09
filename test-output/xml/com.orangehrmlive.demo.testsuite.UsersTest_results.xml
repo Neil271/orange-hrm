@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="UsersPage Test"
+           tests="1"
+           failures="0"
+           errors="0"
+           skipped="0"
+           time="3.685">
+  <properties />
+  
+  
+            <testcase name="adminShouldAddUserSuccessFully" time="3.685" classname="com.orangehrmlive.demo.testsuite.UsersTest" />
+      
+</testsuite>
