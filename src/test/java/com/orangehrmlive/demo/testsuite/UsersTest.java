@@ -2,35 +2,32 @@ package com.orangehrmlive.demo.testsuite;
 
 import com.orangehrmlive.demo.pages.*;
 import com.orangehrmlive.demo.testbase.TestBase;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.locators.RelativeLocator;
-import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.util.List;
+import resources.testdata.TestData;
 
 public class UsersTest extends TestBase {
 
-    /**
-     * Assert method
-     */
-    public void verifyText(String actualText, String expectedText, String message) {
-        Assert.assertEquals(actualText, expectedText, message);
+    LoginPage loginPage;
+    DashboardPage dashboardPage;
+    AdminPage adminPage;
+    AddUserPage addUserPage;
+    ViewSystemUsersPage viewSystemUsersPage;
+
+
+    @BeforeMethod(alwaysRun = true)
+    public void inIt() {
+        loginPage = new LoginPage();
+        dashboardPage = new DashboardPage();
+        adminPage = new AdminPage();
+        addUserPage = new AddUserPage();
+        viewSystemUsersPage = new ViewSystemUsersPage();
+
     }
 
-    LoginPage loginPage = new LoginPage();
-    DashboardPage dashboardPage = new DashboardPage();
-    AdminPage adminPage = new AdminPage();
-    AddUserPage addUserPage = new AddUserPage();
-    ViewSystemUsersPage viewSystemUsersPage=new ViewSystemUsersPage();
 
-
-    //1.adminShouldAddUserSuccessFully().
-    @Test
-    public void adminShouldAddUserSuccessFully()  {
-
-        // Login to Application
+    @Test(groups = {"sanity"}, dataProvider = "AddUser", dataProviderClass = TestData.class)
+    public void adminShouldAddUserSuccessFully(String username, String userRole, String employeeName, String status) {
         // Enter username
         //loginPage.enterUserName("Admin");
         loginPage.enterUserName("Admin");
@@ -44,59 +41,44 @@ public class UsersTest extends TestBase {
         //click On "Admin" Tab
         dashboardPage.clickOnAdminTab();
 
-        //	Verify "System Users" Text
-        String expectedSystemUsersText = "System Users";
-        String actualSystemsText = adminPage.verifySystemUsersText();
-        verifyText(actualSystemsText, expectedSystemUsersText, "System Users text not displayed");
+        //Verify "System Users" Text
+        adminPage.verifySystemUsersText("System Users", "System Users text not displayed");
 
-        //	click On "Add" button
+        //click On "Add" button
         adminPage.clickOnAddButton();
 
-        //	Verify "Add User" Text
-        String expectedText = "Add User";
-        String actualText = addUserPage.verifyAddUserText();
-        verifyText(actualText, expectedText, "Add User not displayed");
+        //Verify "Add User" Text
+        addUserPage.verifyAddUserText("Add User", "User not added");
 
-        //	Select User Role "Admin"
-        // Open the dropdown
-        WebElement dropdown = driver.findElement(By.xpath("//div[@class='dropdown']"));
-        dropdown.click();
+        //Select User Role "Admin"
+        addUserPage.selectRoleAdmin(userRole);
 
-        // Select the "Admin" option
-        WebElement adminOption = driver.findElement(By.xpath("//div[@class='dropdown']//li[text()='Admin']"));
-        adminOption.click();
-       // addUserPage.selectDropDown();
-        // addUserPage.selectRoleAdmin("Admin");
-       // addUserPage.selectUserRoleAsAdmin();
+        //enter Employee Name "Ananya Dash"
+        addUserPage.enterEmployeeName(employeeName);
 
-        //	enter Employee Name "Ananya Dash"
-        addUserPage.enterEmployeeName("Ananya Dash");
+        //enter Username
+        addUserPage.enterUserName(username);
 
-        //	enter Username
-        addUserPage.enterUserName("Payal");
+        //Select status "Disable"
+        addUserPage.selectStatus(status);
 
-        //	Select status "Disable"
+        //enter psaaword
+        addUserPage.enterPassword("Payal123@");
 
-        //	enter password
-        addUserPage.enterPassword("12345");
+        //enter Confirm Password
+        addUserPage.enterConfirmPassword("Payal123@");
 
-        //	enter Confirm Password
-        addUserPage.enterConfirmPassword("12345");
-
-        //	click On "Save" Button
+        //click On "Save" Button
         addUserPage.clickOnSaveButton();
 
-        //	verify message "Successfully Saved"
-//        String expectedSuccessText="Successfully Saved";
-//        String actualSuccessText=addUserPage.verifySuccessfullySavedMessage();
-//        verifyText(actualSuccessText,expectedSuccessText,"Message not displayed");
+        //verify message "Successfully Saved"
+        addUserPage.verifyAddUserSuccessfulMessage("Successfully Saved", "Message is not displayed");
 
     }
 
-
-    //2. searchTheUserCreatedAndVerifyIt().
-    @Test
+    @Test(groups = {"smoke"})
     public void searchTheUserCreatedAndVerifyIt() {
+
         //	Login to Application
         // Enter username
         loginPage.enterUserName("Admin");
@@ -110,43 +92,25 @@ public class UsersTest extends TestBase {
         //click On "Admin" Tab
         dashboardPage.clickOnAdminTab();
 
-        //	Verify "System Users" Text
-//        String expectedSystemUsersText="System Users";
-//        String actualSystemsText= adminPage.verifySystemUsersText();
-//        verifyText(actualSystemsText,expectedSystemUsersText,"System Users text not displayed");
+        //Verify "System Users" Text
+        //adminPage.verifySystemUsersText("System Users","System Users text not displayed");
 
         //	Enter Username
-        addUserPage.enterUserName("Neel");
+        viewSystemUsersPage.setUserName("Payal1");
 
         //	Select User Role
+        viewSystemUsersPage.selectRole("Admin");
+
         //	Select Satatus
+        viewSystemUsersPage.selectStatus("Disable");
 
         //	Click on "Search" Button
-        addUserPage.clickOnSearchButton();
-
-        //	Verify the User should be in Result list.
-        List<WebElement> resultRows = addUserPage.verifyUserInResultList();
-        boolean userFound = false;
-
-        for (WebElement row : resultRows) {
-            String username = row.findElement(RelativeLocator.with(By.tagName("input")).below(By.xpath("//label[normalize-space()='Username']"))).getText();
-
-            if (username.equals("payal9")) { // Replace "testuser" with the username you're verifying
-                userFound = true;
-                break;
-            }
-        }
-        if (userFound) {
-            System.out.println("User found in the result list.");
-        } else {
-            System.out.println("User NOT found in the result list.");
-        }
-
-
+        viewSystemUsersPage.clickOnSearchButton();
+        //Verify the User should be in Result list.
+        viewSystemUsersPage.verifyUserInResultList("Payal1", "User not found");
     }
 
-    //3. verifyThatAdminShouldDeleteTheUserSuccessFully.
-    @Test
+    @Test(groups = {"regression"})
     public void verifyThatAdminShouldDeleteTheUserSuccessFully() {
         //	Login to Application
         // Enter username
@@ -161,20 +125,27 @@ public class UsersTest extends TestBase {
         //click On "Admin" Tab
         dashboardPage.clickOnAdminTab();
 
-        //	Verify "System Users" Text
-//        String expectedSystemUsersText="System Users";
-//        String actualSystemsText= adminPage.verifySystemUsersText();
-//        verifyText(actualSystemsText,expectedSystemUsersText,"System Users text not displayed");
+        //Verify "System Users" Text
+        //adminPage.verifySystemUsersText("System Users","System Users text not displayed");
 
         //	Enter Username
-        addUserPage.enterUserName("Neel");
+        viewSystemUsersPage.setUserName("Payal1");
 
         //	Select User Role
+        viewSystemUsersPage.selectRole("Admin");
+
         //	Select Satatus
+        viewSystemUsersPage.selectStatus("Disable");
+
         //	Click on "Search" Button
-        addUserPage.clickOnSearchButton();
+        viewSystemUsersPage.clickOnSearchButton();
 
         //	Verify the User should be in Result list.
+       /* String actualUser = viewSystemUsersPage.verifyUserInResultList();
+        String expectedUser = "neel1";
+        verifyText(actualUser, expectedUser, "User not found");*/
+        viewSystemUsersPage.verifyUserInResultList("Payal1", "User not found");
+
         //	Click on Check box
         viewSystemUsersPage.clickOnCheckbox();
 
@@ -182,18 +153,17 @@ public class UsersTest extends TestBase {
         viewSystemUsersPage.clickOnDeleteButton();
 
         //	Popup will display
-
+        viewSystemUsersPage.popUpDisplay();
 
         //	Click on Ok Button on Popup
-        viewSystemUsersPage.acceptAlert();
+        viewSystemUsersPage.clickOkOnPopUP();
 
         //	verify message "Successfully Deleted"
-
+        viewSystemUsersPage.verifyDeleteUserSuccessfulMessage("Successfully Deleted", "Message is not displayed");
 
     }
 
-    //4. searchTheDeletedUserAndVerifyTheMessageNoRecordFound.
-    @Test
+    @Test(groups = {"regression"})
     public void searchTheDeletedUserAndVerifyTheMessageNoRecordFound() {
         //	Login to Application
         // Enter username
@@ -208,21 +178,35 @@ public class UsersTest extends TestBase {
         //click On "Admin" Tab
         dashboardPage.clickOnAdminTab();
 
-        //	Verify "System Users" Text
-//        String expectedSystemUsersText="System Users";
-//        String actualSystemsText= adminPage.verifySystemUsersText();
-//        verifyText(actualSystemsText,expectedSystemUsersText,"System Users text not displayed");
+        //Verify "System Users" Text
+        adminPage.verifySystemUsersText("System Users", "System Users text not displayed");
 
         //	Enter Username
-        addUserPage.enterUserName("Neel");
+        viewSystemUsersPage.setUserName("Payal1");
 
         //	Select User Role
+        viewSystemUsersPage.selectRole("Admin");
+
         //	Select Satatus
+        viewSystemUsersPage.selectStatus("Disable");
+
         //	Click on "Search" Button
-        addUserPage.clickOnSearchButton();
+        viewSystemUsersPage.clickOnSearchButton();
 
         //	verify message "No Records Found"
-        addUserPage.verifyNoUserFound();
+        viewSystemUsersPage.verifyNoUserFoundedMessage("No Records Found", "Message is not displayed");
 
+        //verify message "(1) Record Found"
+        viewSystemUsersPage.verifyOneRecordFound("(1) Record Found", "Message not displayed");
+
+//        //Verify username <username>
+//        String expectedText="username";
+//        String actualText= viewSystemUsersPage.verifyUserNameTag();
+//        verifyText(actualText,expectedText,"Tag not displayed");
+
+
+        //Click on Reset Tab
+        viewSystemUsersPage.clickOnResetButton();
     }
+
 }

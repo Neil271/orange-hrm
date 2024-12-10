@@ -5,22 +5,52 @@ import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.*;
+import org.testng.Assert;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public class Utility extends ManageBrowser {
+    /*Utility Class extends to ManageDriver for the driver to finding locators
+     *All common methods are fixed in the utility Class.
+     *
+     * This method will generate random number
+     */
+    public int generateRandomNumber() {
+        return (int) (Math.random() * 5000 + 1);
+
+    }
+    /**
+     * Assert Methods
+     */
+    public void verifyText(String actual,String expected,String message){
+        Assert.assertEquals(actual,expected,message);
+    }
+
+    /**
+     * This method will generate random string
+     */
+    public static String getRandomString(int length) {
+        StringBuilder sb = new StringBuilder();
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        for (int i = 0; i < length; i++) {
+            int index = (int) (Math.random() * characters.length());
+            sb.append(characters.charAt(index));
+        }
+        return sb.toString();
+    }
+
     /**
      * This method will click on element
      */
     public void clickOnElement(By by) {
-        WebElement loginLink = driver.findElement(by);
-        loginLink.click();
+        WebElement element = driver.findElement(by);
+        element.click();
     }
 
     public void clickOnElement(WebElement element) {
@@ -34,34 +64,42 @@ public class Utility extends ManageBrowser {
         return driver.findElement(by).getText();
     }
 
+    public String getTextFromElement(WebElement element) {
+        return element.getText();
+    }
 
     /**
      * This method will send text on element
      */
     public void sendTextToElement(By by, String text) {
-        driver.findElement(by).clear();
         driver.findElement(by).sendKeys(text);
     }
 
-    public void sendTextToElement(WebElement element, String text) {
-        element.sendKeys(text);
+    public void sendTextToElement(WebElement element, String str) {
+        element.sendKeys(str);
     }
 
     /**
-     * This method will return all List of Elements
-     * */
-    public List<WebElement> findElements(By by){
+     * This method will return list of web elements
+     */
+    public List<WebElement> webElementList(By by) {
         return driver.findElements(by);
     }
 
     /**
-     *  This Method will verify the actual and expected elements
-     * */
-    public void verifyText(){
-        //Assert.assertEquals
+     * This method will clear previous stored data
+     */
+    public void clearTextFromField(By by) {
+        driver.findElement(by).sendKeys(Keys.CONTROL + "a");
+        driver.findElement(by).sendKeys(Keys.DELETE);
     }
 
-    //************************* Alert Methods *****************************************************
+    public void sendTabAndEnterKey(By by) {
+        driver.findElement(by).sendKeys(Keys.TAB);
+        //driver.findElement(by).sendKeys(Keys.ENTER);
+    }
+
+//*************************** Alert Methods ***************************************//
 
     /**
      * This method will switch to alert
@@ -98,51 +136,55 @@ public class Utility extends ManageBrowser {
         driver.switchTo().alert().sendKeys(text);
     }
 
-    //*************************** Select Class Methods ***************************************//
+
+//*************************** Select Class Methods ***************************************//
 
     /**
      * This method will select the option by visible text
      */
-// public void selectByVisibleTextFromDropDown(By by, String text) {
-//   WebElement dropDown = driver.findElement(by);
-//      Select select = new Select(dropDown);
-//     select.selectByVisible
-//
-//    }
-   // **
-    //        * This method will select the option by visible text
-// */
     public void selectByVisibleTextFromDropDown(By by, String text) {
         WebElement dropDown = driver.findElement(by);
-        org.openqa.selenium.support.ui.Select select = new Select(dropDown);
+        Select select = new Select(dropDown);
         select.selectByVisibleText(text);
+    }
+
+    public void selectByVisibleTextFromDropDown(WebElement element, String text) {
+        new Select(element).selectByVisibleText(text);
     }
 
     /**
      * This method will select the option by value
      */
-//    public void selectByValueFromDropDown(By by, String value) {
-//        new Select(driver.findElement(by)).selectByValue(value);
-//    }
+    public void selectByValueFromDropDown(By by, String value) {
+        new Select(driver.findElement(by)).selectByValue(value);
+    }
+
+    public void selectByValueFromDropDown(WebElement element, String value) {
+        new Select(element).selectByValue(value);
+    }
 
     /**
      * This method will select the option by index
      */
-//    public void selectByIndexFromDropDown(By by, int index) {
-//        new Select(driver.findElement(by)).selectByIndex(index);
-//    }
+    public void selectByIndexFromDropDown(By by, int index) {
+        new Select(driver.findElement(by)).selectByIndex(index);
+    }
+
+    public void selectByIndexFromDropDown(WebElement element, int index) {
+        new Select(element).selectByIndex(index);
+    }
 
     /**
      * This method will select the option by contains text
      */
-//    public void selectByContainsTextFromDropDown(By by, String text) {
-//        List<WebElement> allOptions = new Select(driver.findElement(by)).getOptions();
-//        for (WebElement options : allOptions) {
-//            if (options.getText().contains(text)) {
-//                options.click();
-//            }
-//        }
-//    }
+    public void selectByContainsTextFromDropDown(By by, String text) {
+        List<WebElement> allOptions = new Select(driver.findElement(by)).getOptions();
+        for (WebElement options : allOptions) {
+            if (options.getText().contains(text)) {
+                options.click();
+            }
+        }
+    }
 
 //*************************** Window Handle Methods ***************************************//
 
@@ -187,12 +229,30 @@ public class Utility extends ManageBrowser {
         actions.moveToElement(driver.findElement(by)).build().perform();
     }
 
+    public void mouseHoverToElement(WebElement element) {
+        Actions actions = new Actions(driver);
+        actions.moveToElement(element).perform();
+    }
+
     /**
      * This method will use to hover mouse on element and click
      */
     public void mouseHoverToElementAndClick(By by) {
         Actions actions = new Actions(driver);
-        actions.moveToElement(driver.findElement(by)).click().build().perform();
+        actions.moveToElement(driver.findElement(by)).click().perform();
+    }
+
+    public void mouseHoverToElementAndClick(WebElement element) {
+        Actions actions = new Actions(driver);
+        actions.moveToElement(element).click().perform();
+    }
+
+    /**
+     * This method will select select element by using keyboard events
+     */
+    public void typeKeysAndEnter(String key){
+        Actions actions=new Actions(driver);
+        actions.keyDown(key.toLowerCase()).keyUp(key.toLowerCase()).sendKeys(Keys.ENTER).build().perform();
     }
 
     //************************** Waits Methods *********************************************//
@@ -219,13 +279,87 @@ public class Utility extends ManageBrowser {
         return element;
     }
 
+//***************************** Is Display Methods **********************************************//
+    /**
+     * This method will verify that element is displayed
+     */
+    public boolean verifyThatElementIsDisplayed(By by) {
+        WebElement element = driver.findElement(by);
+        if (element.isDisplayed()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean verifyThatElementIsDisplayed(WebElement element) {
+        if (element.isDisplayed()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * This method will verify that element is displayed
+     */
+    public boolean verifyThatTextIsDisplayed(By by, String text) {
+        WebElement element = driver.findElement(by);
+        if (text.equals(element.getText())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean verifyThatTextIsDisplayed(WebElement element, String text) {
+        if (text.equals(element.getText())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //************************** ScreenShot Methods *********************************************//
+
+    /**
+     * This method will take screenshot
+     */
+    public static void takeScreenShot() {
+        String filePath = System.getProperty("user.dir") + "/src/main/java/com/nopcommerce/demo/screenshots/";
+        TakesScreenshot screenshot = (TakesScreenshot) driver;
+        File scr1 = screenshot.getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(scr1, new File(filePath + getRandomString(10) + ".jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static String currentTimeStamp() {
         Date d = new Date();
         return d.toString().replace(":", "_").replace(" ", "_");
     }
 
+    public static String getScreenshot(WebDriver driver, String screenshotName) {
+        String dateName = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+        TakesScreenshot ts = (TakesScreenshot) driver;
+        File source = ts.getScreenshotAs(OutputType.FILE);
+
+        // After execution, you could see a folder "FailedTestsScreenshots" under screenshot folder
+        String destination = System.getProperty("user.dir") + "/src/main/java/com/demo/nopcommerce/screenshots/" + screenshotName + dateName + ".png";
+        File finalDestination = new File(destination);
+        try {
+            FileUtils.copyFile(source, finalDestination);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return destination;
+    }
+
+    /*
+     *Screenshot methods
+     */
     public static String takeScreenShot(String fileName) {
         String filePath = System.getProperty("user.dir") + "/test-output/html/";
         TakesScreenshot screenshot = (TakesScreenshot) driver;

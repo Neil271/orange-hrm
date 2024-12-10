@@ -4,10 +4,10 @@
            failures="0"
            errors="0"
            skipped="0"
-           time="1.507">
+           time="2.004">
   <properties />
   
   
-            <testcase name="verifyUserShouldLoginSuccessFully" time="1.507" classname="com.orangehrmlive.demo.testsuite.LoginTest" />
+            <testcase name="verifyThatTheLogoDisplayOnHomePage" time="2.004" classname="com.orangehrmlive.demo.testsuite.LoginTest" />
       
 </testsuite>

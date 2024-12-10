@@ -1,24 +1,20 @@
 package com.orangehrmlive.demo.testbase;
 
-
 import com.orangehrmlive.demo.propertyreader.PropertyReader;
 import com.orangehrmlive.demo.utilities.Utility;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 public class TestBase extends Utility {
-    //get the browser
     String browser = PropertyReader.getInstance().getProperty("browser");
 
-    //Open browser
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setUp() {
         selectBrowser(browser);
     }
 
-    //close the browser
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDown() {
-       // closeBrowser();
+        // closeBrowser();
     }
 }

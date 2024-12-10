@@ -21,6 +21,8 @@ public class PropertyReader {
 
     /**
      * This method will return instance of PropertyReader class
+     *
+     * @return
      */
     public static synchronized PropertyReader getInstance() {
         if (propInstance == null) {
@@ -31,6 +33,9 @@ public class PropertyReader {
 
     /**
      * This method will read property from property file
+     *
+     * @param propertyName
+     * @return
      */
     public String getProperty(String propertyName) {
 
@@ -47,5 +52,4 @@ public class PropertyReader {
         }
         return null;
     }
-
 }
